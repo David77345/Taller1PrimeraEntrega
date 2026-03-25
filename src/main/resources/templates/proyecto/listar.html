@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Listado de Proyectos</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+
+<body>
+    <h1 th:text="${titulo}"></h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Id Cliente</th>
+                <th>Fecha</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr th:each="proyecto : ${proyectos}">
+                <td th:text="${proyecto.id}"></td>
+                <td th:text="${proyecto.nombre}"></td>
+                <td th:text="${proyecto.idCliente}"></td>
+                <td th:text="${proyecto.fecha}"></td>
+
+                <td>
+                    <a class="editar" th:href="@{/proyecto/form/{id}(id=${proyecto.id})}">Editar</a>
+                </td>
+
+                <td>
+                    <a class="eliminar" th:href="@{/proyecto/eliminar/{id}(id=${proyecto.id})}">Eliminar</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+
+    <a class="crear" th:href="@{/proyecto/form}">Crear Proyecto</a>
+</body>
+</html>

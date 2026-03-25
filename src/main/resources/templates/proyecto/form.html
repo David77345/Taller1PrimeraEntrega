@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Formulario de Proyecto</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div class="container form-container">
+        <div class="topbar">
+            <h1 th:text="${titulo}">Formulario de Proyecto</h1>
+            <a class="btn btn-secondary" th:href="@{/proyecto/listar}">Volver</a>
+        </div>
+
+        <form th:action="@{/proyecto/form}" th:object="${proyecto}" method="post" class="form-card">
+            <input type="hidden" th:field="*{id}">
+
+            <label for="nombre">Nombre del proyecto</label>
+            <input type="text" id="nombre" th:field="*{nombre}">
+            <small class="error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
+
+            <label for="idCliente">Id Cliente</label>
+            <input type="number" id="idCliente" th:field="*{idCliente}">
+            <small class="error" th:if="${#fields.hasErrors('idCliente')}" th:errors="*{idCliente}"></small>
+
+            <label for="fecha">Fecha</label>
+            <input type="date" id="fecha" th:field="*{fecha}">
+            <small class="error" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></small>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+</body>
+</html>
