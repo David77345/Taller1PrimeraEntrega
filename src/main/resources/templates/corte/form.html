@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Formulario de Corte</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="container">
+    <div class="form-layout">
+        <div class="form-header">
+            <div>
+                <h1 th:text="${titulo}">Formulario de Corte</h1>
+                <p>Registra los materiales ejecutados en el corte y consolida el total correspondiente.</p>
+            </div>
+            <div class="form-actions">
+                <a class="btn btn-secondary" th:href="@{/corte/listar}">Volver</a>
+            </div>
+        </div>
+
+        <form th:action="@{/corte/form}" th:object="${corte}" method="post" class="form-card">
+            <input type="hidden" th:if="${corte.id != null}" th:field="*{id}">
+
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error">
+                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+            </div>
+
+            <div class="form-grid">
+                <div class="field-group full" th:if="${modoEdicion}">
+                    <label>ID del corte</label>
+                    <input type="text" class="readonly-input" th:value="${corte.id}" readonly>
+                    <span class="field-help">El identificador se conserva para seguimiento del corte registrado.</span>
+                </div>
+
+                <div class="field-group full">
+                    <label for="presupuestoId">Presupuesto asociado</label>
+                    <select id="presupuestoId" th:field="*{presupuestoId}">
+                        <option value="">Seleccione un presupuesto</option>
+                        <option th:each="presupuesto : ${presupuestoOpciones}"
+                                th:value="${presupuesto.id}"
+                                th:text="${presupuesto.nombreProyecto + ' | Presupuesto ' + presupuesto.idCorto}">
+                        </option>
+                    </select>
+                    <span class="field-help">Selecciona el presupuesto al que se cargará el valor del corte.</span>
+                    <small class="error-text" th:if="${#fields.hasErrors('presupuestoId')}" th:errors="*{presupuestoId}"></small>
+                </div>
+
+                <div class="summary-grid field-group full" th:if="${!#lists.isEmpty(presupuestoOpciones)}">
+                    <div class="summary-box" th:each="op : ${presupuestoOpciones}" th:if="${op.id == corte.presupuestoId}">
+                        <div class="summary-label">Proyecto</div>
+                        <div class="summary-value" th:text="${op.nombreProyecto}"></div>
+                    </div>
+                    <div class="summary-box" th:each="op : ${presupuestoOpciones}" th:if="${op.id == corte.presupuestoId}">
+                        <div class="summary-label">Saldo disponible</div>
+                        <div class="summary-value money" th:attr="data-money=${op.saldoDisponible}" th:text="${op.saldoDisponible}"></div>
+                    </div>
+                    <div class="summary-box" th:each="op : ${presupuestoOpciones}" th:if="${op.id == corte.presupuestoId}">
+                        <div class="summary-label">Total gastado actual</div>
+                        <div class="summary-value money" th:attr="data-money=${op.totalGastado}" th:text="${op.totalGastado}"></div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label for="fecha">Fecha</label>
+                    <input type="date" id="fecha" th:field="*{fecha}">
+                    <span class="field-help">Fecha en la que se registra o ejecuta el corte.</span>
+                    <small class="error-text" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></small>
+                </div>
+
+                <div class="field-group full">
+                    <label for="observacion">Observación</label>
+                    <textarea id="observacion" th:field="*{observacion}" placeholder="Observaciones generales del corte, frente de trabajo o detalle adicional."></textarea>
+                    <span class="field-help">Campo opcional para dejar notas de soporte o contexto del corte.</span>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">
+                    <div>
+                        <h2>Materiales del corte</h2>
+                        <p>Puedes repetir el mismo material en varias filas si corresponde a registros separados.</p>
+                    </div>
+                    <div class="inline-actions">
+                        <button type="button" id="btn-agregar-fila" class="btn btn-secondary btn-small">Agregar material</button>
+                    </div>
+                </div>
+
+                <div class="table-card table-responsive">
+                    <table id="tabla-detalles" class="details-table">
+                        <thead>
+                        <tr>
+                            <th class="material-col">Material</th>
+                            <th class="qty-col">Cantidad</th>
+                            <th class="price-col">Precio unitario</th>
+                            <th class="subtotal-col">Subtotal</th>
+                            <th class="action-col">Quitar</th>
+                        </tr>
+                        </thead>
+                        <tbody id="detalle-body">
+                        <tr th:each="detalle, iter : *{detalles}" class="detalle-row">
+                            <td>
+                                <select th:field="*{detalles[__${iter.index}__].materialId}" class="material-select">
+                                    <option value="">Seleccione un material</option>
+                                    <option th:each="material : ${materiales}"
+                                            th:value="${material.id}"
+                                            th:text="${material.nombre}"
+                                            th:attr="data-precio=${material.valorUnitario}">
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" min="1" step="1" th:field="*{detalles[__${iter.index}__].cantidad}" class="cantidad-input" placeholder="0">
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" th:field="*{detalles[__${iter.index}__].precioUnitario}" class="precio-input readonly-input" readonly>
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" th:field="*{detalles[__${iter.index}__].subtotal}" class="subtotal-input readonly-input" readonly>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-small btn-quitar">Quitar</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="total-highlight">
+                    <label for="total">Total del corte</label>
+                    <input type="number" step="0.01" id="total" th:field="*{total}" class="readonly-input" readonly>
+                    <span class="field-help">El total se calcula automáticamente con base en las filas válidas del corte.</span>
+                </div>
+            </div>
+
+            <div class="form-actions" style="margin-top: 24px;">
+                <button type="submit" class="btn btn-primary" th:text="${modoEdicion} ? 'Actualizar corte' : 'Guardar corte'"></button>
+                <a class="btn btn-light" th:href="@{/corte/listar}">Cancelar</a>
+            </div>
+        </form>
+
+        <select id="material-template" style="display:none;">
+            <option value="">Seleccione un material</option>
+            <option th:each="material : ${materiales}"
+                    th:value="${material.id}"
+                    th:text="${material.nombre}"
+                    th:attr="data-precio=${material.valorUnitario}">
+            </option>
+        </select>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const body = document.getElementById('detalle-body');
+        const btnAgregar = document.getElementById('btn-agregar-fila');
+        const totalInput = document.getElementById('total');
+        const materialTemplate = document.getElementById('material-template').innerHTML;
+        const formatter = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+
+        function formatMoneyElements() {
+            document.querySelectorAll('.money[data-money]').forEach(el => {
+                const value = Number(el.dataset.money || 0);
+                el.textContent = formatter.format(value);
+            });
+        }
+
+        function getSelectedPrice(row) {
+            const precioInput = row.querySelector('.precio-input');
+            return parseFloat(precioInput.value) || 0;
+        }
+
+        function setPriceFromSelectedMaterial(row) {
+            const select = row.querySelector('.material-select');
+            const precioInput = row.querySelector('.precio-input');
+            const selectedOption = select.options[select.selectedIndex];
+            const precio = parseFloat(selectedOption?.getAttribute('data-precio')) || 0;
+            precioInput.value = precio ? precio.toFixed(2) : '';
+        }
+
+        function recalcularFila(row) {
+            const cantidadInput = row.querySelector('.cantidad-input');
+            const subtotalInput = row.querySelector('.subtotal-input');
+            const cantidad = parseInt(cantidadInput.value, 10) || 0;
+            const precio = getSelectedPrice(row);
+            const subtotal = cantidad * precio;
+            subtotalInput.value = subtotal ? subtotal.toFixed(2) : '';
+            recalcularTotal();
+        }
+
+        function recalcularTotal() {
+            let total = 0;
+            document.querySelectorAll('.subtotal-input').forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            totalInput.value = total.toFixed(2);
+        }
+
+        function renumerarFilas() {
+            const rows = body.querySelectorAll('.detalle-row');
+            rows.forEach((row, index) => {
+                row.querySelector('.material-select').setAttribute('name', `detalles[${index}].materialId`);
+                row.querySelector('.cantidad-input').setAttribute('name', `detalles[${index}].cantidad`);
+                row.querySelector('.precio-input').setAttribute('name', `detalles[${index}].precioUnitario`);
+                row.querySelector('.subtotal-input').setAttribute('name', `detalles[${index}].subtotal`);
+            });
+            recalcularTotal();
+        }
+
+        function configurarFila(row) {
+            const select = row.querySelector('.material-select');
+            const cantidadInput = row.querySelector('.cantidad-input');
+            const btnQuitar = row.querySelector('.btn-quitar');
+
+            select.addEventListener('change', function () {
+                setPriceFromSelectedMaterial(row);
+                recalcularFila(row);
+            });
+
+            cantidadInput.addEventListener('input', function () {
+                recalcularFila(row);
+            });
+
+            btnQuitar.addEventListener('click', function () {
+                row.remove();
+                if (!body.querySelector('.detalle-row')) {
+                    crearFila();
+                }
+                renumerarFilas();
+            });
+
+            recalcularFila(row);
+        }
+
+        function crearFila() {
+            const row = document.createElement('tr');
+            row.className = 'detalle-row';
+            row.innerHTML = `
+                <td>
+                    <select class="material-select">${materialTemplate}</select>
+                </td>
+                <td>
+                    <input type="number" min="1" step="1" class="cantidad-input" placeholder="0">
+                </td>
+                <td>
+                    <input type="number" step="0.01" class="precio-input readonly-input" readonly>
+                </td>
+                <td>
+                    <input type="number" step="0.01" class="subtotal-input readonly-input" readonly>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-small btn-quitar">Quitar</button>
+                </td>
+            `;
+            body.appendChild(row);
+            configurarFila(row);
+            renumerarFilas();
+        }
+
+        document.querySelectorAll('.detalle-row').forEach(configurarFila);
+        btnAgregar.addEventListener('click', crearFila);
+        renumerarFilas();
+        formatMoneyElements();
+    });
+</script>
+</body>
+</html>

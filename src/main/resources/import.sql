@@ -1,3 +1,5 @@
+ALTER TABLE proyectos ALTER COLUMN ID RESTART WITH 11;
+
 INSERT INTO proyectos (id, nombre, id_cliente, fecha) VALUES (1, 'Remodelacion sala principal', 101, DATE '2026-03-01');
 INSERT INTO proyectos (id, nombre, id_cliente, fecha) VALUES (2, 'Adecuacion oficina administrativa', 102, DATE '2026-03-02');
 INSERT INTO proyectos (id, nombre, id_cliente, fecha) VALUES (3, 'Construccion terraza exterior', 103, DATE '2026-03-03');
@@ -9,16 +11,20 @@ INSERT INTO proyectos (id, nombre, id_cliente, fecha) VALUES (8, 'Cambio de puer
 INSERT INTO proyectos (id, nombre, id_cliente, fecha) VALUES (9, 'Reforzamiento muro lateral', 109, DATE '2026-03-09');
 INSERT INTO proyectos (id, nombre, id_cliente, fecha) VALUES (10, 'Mantenimiento local comercial', 110, DATE '2026-03-10');
 
-INSERT INTO presupuestos (id, id_proyecto, total) VALUES (1, 1, 1850000);
-INSERT INTO presupuestos (id, id_proyecto, total) VALUES (2, 2, 1320000);
-INSERT INTO presupuestos (id, id_proyecto, total) VALUES (3, 3, 2640000);
-INSERT INTO presupuestos (id, id_proyecto, total) VALUES (4, 4, 980000);
-INSERT INTO presupuestos (id, id_proyecto, total) VALUES (5, 5, 1560000);
-INSERT INTO presupuestos (id, id_proyecto, total) VALUES (6, 6, 890000);
-INSERT INTO presupuestos (id, id_proyecto, total) VALUES (7, 7, 2140000);
-INSERT INTO presupuestos (id, id_proyecto, total) VALUES (8, 8, 760000);
-INSERT INTO presupuestos (id, id_proyecto, total) VALUES (9, 9, 1730000);
-INSERT INTO presupuestos (id, id_proyecto, total) VALUES (10, 10, 1190000);
+
+INSERT INTO presupuestos (id, id_proyecto, total) VALUES (1, 1, 1492000);
+INSERT INTO presupuestos (id, id_proyecto, total) VALUES (2, 2, 1318000);
+INSERT INTO presupuestos (id, id_proyecto, total) VALUES (3, 3, 2646000);
+INSERT INTO presupuestos (id, id_proyecto, total) VALUES (4, 4, 990000);
+INSERT INTO presupuestos (id, id_proyecto, total) VALUES (5, 5, 1530000);
+INSERT INTO presupuestos (id, id_proyecto, total) VALUES (6, 6, 869000);
+INSERT INTO presupuestos (id, id_proyecto, total) VALUES (7, 7, 2091000);
+INSERT INTO presupuestos (id, id_proyecto, total) VALUES (8, 8, 772000);
+INSERT INTO presupuestos (id, id_proyecto, total) VALUES (9, 9, 1738000);
+INSERT INTO presupuestos (id, id_proyecto, total) VALUES (10, 10, 850000);
+
+ALTER TABLE presupuestos ALTER COLUMN ID RESTART WITH 11;
+
 
 INSERT INTO materiales (id, nombre, descripcion, valor_unitario) VALUES (1, 'Cemento gris', 'Bolsa de cemento gris 50kg', 38000);
 INSERT INTO materiales (id, nombre, descripcion, valor_unitario) VALUES (2, 'Arena lavada', 'Metro cubico de arena lavada', 95000);
@@ -40,6 +46,9 @@ INSERT INTO materiales (id, nombre, descripcion, valor_unitario) VALUES (17, 'Tu
 INSERT INTO materiales (id, nombre, descripcion, valor_unitario) VALUES (18, 'Codo PVC', 'Codo PVC sanitario', 7000);
 INSERT INTO materiales (id, nombre, descripcion, valor_unitario) VALUES (19, 'Brocha 4 pulgadas', 'Brocha profesional 4 pulgadas', 12000);
 INSERT INTO materiales (id, nombre, descripcion, valor_unitario) VALUES (20, 'Rodillo pintura', 'Rodillo para pintura de muro', 18000);
+
+ALTER TABLE materiales ALTER COLUMN ID RESTART WITH 21;
+
 
 INSERT INTO detalle_presupuesto (id, id_presupuesto, id_material, stock, subtotal) VALUES (1, 1, 1, 10, 380000);
 INSERT INTO detalle_presupuesto (id, id_presupuesto, id_material, stock, subtotal) VALUES (2, 1, 2, 4, 380000);
@@ -109,3 +118,5 @@ INSERT INTO detalle_presupuesto (id, id_presupuesto, id_material, stock, subtota
 INSERT INTO detalle_presupuesto (id, id_presupuesto, id_material, stock, subtotal) VALUES (57, 10, 17, 8, 248000);
 INSERT INTO detalle_presupuesto (id, id_presupuesto, id_material, stock, subtotal) VALUES (58, 10, 18, 6, 42000);
 INSERT INTO detalle_presupuesto (id, id_presupuesto, id_material, stock, subtotal) VALUES (59, 10, 8, 4, 104000);
+
+ALTER TABLE detalle_presupuesto ALTER COLUMN ID RESTART WITH 60;

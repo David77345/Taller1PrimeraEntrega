@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Listado de Cortes</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="container">
+    <div class="page-shell">
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Listado de Cortes</h1>
+                <p>Consulta los cortes registrados, su presupuesto asociado y el total ejecutado.</p>
+            </div>
+
+            <div class="header-actions">
+                <a th:href="@{/}" class="btn btn-secondary">Inicio</a>
+                <a th:href="@{/corte/form}" class="btn btn-primary">Nuevo corte</a>
+            </div>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <div th:if="${#lists.isEmpty(cortes)}" class="empty-state">
+            <h3>No hay cortes registrados</h3>
+            <p>Cuando registres un corte de obra, aparecerá aquí con su resumen principal.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(cortes)}" class="table-card table-responsive">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Proyecto</th>
+                    <th>Presupuesto</th>
+                    <th>Fecha</th>
+                    <th>Items</th>
+                    <th>Total corte</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="corte : ${cortes}">
+                    <td class="cell-id" th:title="${corte.id}">
+                        <span th:text="${corte.id != null and corte.id.length() > 14 ? corte.id.substring(0, 8) + '...' + corte.id.substring(corte.id.length() - 4) : corte.id}"></span>
+                    </td>
+                    <td th:text="${corte.nombreProyecto}"></td>
+                    <td class="cell-id" th:title="${corte.presupuestoId}">
+                        <span th:text="${corte.presupuestoId != null and corte.presupuestoId.length() > 14 ? corte.presupuestoId.substring(0, 8) + '...' + corte.presupuestoId.substring(corte.presupuestoId.length() - 4) : corte.presupuestoId}"></span>
+                    </td>
+                    <td th:text="${corte.fecha != null ? #dates.format(corte.fecha, 'yyyy-MM-dd') : ''}"></td>
+                    <td><span class="badge-soft" th:text="${corte.cantidadItems} + ' item(s)'"></span></td>
+                    <td class="cell-number"><span class="money" th:attr="data-money=${corte.total}" th:text="${corte.total}"></span></td>
+                    <td>
+                        <a class="btn btn-warning btn-small" th:href="@{/corte/form/{id}(id=${corte.id})}">Editar</a>
+                    </td>
+                    <td>
+                        <a class="btn btn-danger btn-small"
+                           th:href="@{/corte/eliminar/{id}(id=${corte.id})}"
+                           onclick="return confirm('¿Deseas eliminar este corte?');">Eliminar</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const formatter = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+        document.querySelectorAll('.money[data-money]').forEach(el => {
+            const value = Number(el.dataset.money || 0);
+            el.textContent = formatter.format(value);
+        });
+    });
+</script>
+</body>
+</html>

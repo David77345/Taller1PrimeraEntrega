@@ -7,46 +7,73 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-    <div class="container">
-        <div class="topbar">
-            <h1 th:text="${titulo}">Listado de Materiales</h1>
-            <div>
-                <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
-                <a class="btn btn-primary" th:href="@{/material/form}">Nuevo Material</a>
+<div class="container">
+    <div class="page-shell">
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Listado de Materiales</h1>
+                <p>Administra el catálogo de materiales y mantén consistencia en la información base.</p>
+            </div>
+
+            <div class="header-actions">
+                <a th:href="@{/}" class="btn btn-secondary">Inicio</a>
+                <a th:href="@{/material/form}" class="btn btn-primary">Nuevo material</a>
             </div>
         </div>
 
-        <table>
-            <thead>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <div th:if="${#lists.isEmpty(materiales)}" class="empty-state">
+            <h3>No hay materiales registrados</h3>
+            <p>Agrega materiales con su descripción y valor unitario para usarlos en los cortes.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(materiales)}" class="table-card table-responsive">
+            <table>
+                <thead>
                 <tr>
-                    <th>Id</th>
+                    <th>ID</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
-                    <th>Valor Unitario</th>
+                    <th>Valor unitario</th>
                     <th>Editar</th>
                     <th>Eliminar</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 <tr th:each="material : ${materiales}">
-                    <td th:text="${material.id}"></td>
+                    <td class="cell-id" th:title="${material.id}">
+                        <span th:text="${material.id != null and material.id.length() > 14 ? material.id.substring(0, 8) + '...' + material.id.substring(material.id.length() - 4) : material.id}"></span>
+                    </td>
                     <td th:text="${material.nombre}"></td>
                     <td th:text="${material.descripcion}"></td>
-                    <td th:text="${material.valorUnitario}"></td>
-                    <td>
-                        <a class="btn btn-warning" th:href="@{/material/form/{id}(id=${material.id})}">
-                            Editar
-                        </a>
+                    <td class="cell-number">
+                        <span class="money" th:attr="data-money=${material.valorUnitario}" th:text="${material.valorUnitario}"></span>
                     </td>
                     <td>
-                        <a class="btn btn-danger" th:href="@{/material/eliminar/{id}(id=${material.id})}"
-                           onclick="return confirm('¿Deseas eliminar este material?');">
-                            Eliminar
-                        </a>
+                        <a class="btn btn-warning btn-small" th:href="@{/material/form/{id}(id=${material.id})}">Editar</a>
+                    </td>
+                    <td>
+                        <a class="btn btn-danger btn-small"
+                           th:href="@{/material/eliminar/{id}(id=${material.id})}"
+                           onclick="return confirm('¿Deseas eliminar este material?');">Eliminar</a>
                     </td>
                 </tr>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const formatter = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+        document.querySelectorAll('.money[data-money]').forEach(el => {
+            const value = Number(el.dataset.money || 0);
+            el.textContent = formatter.format(value);
+        });
+    });
+</script>
 </body>
 </html>

@@ -7,44 +7,73 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-    <div class="container">
-        <div class="topbar">
-            <h1 th:text="${titulo}">Listado de Presupuestos</h1>
-            <div>
-                <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
-                <a class="btn btn-primary" th:href="@{/presupuesto/form}">Nuevo Presupuesto</a>
+<div class="container">
+    <div class="page-shell">
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Listado de Presupuestos</h1>
+                <p>Controla el monto máximo aprobado, el gasto acumulado y el saldo disponible.</p>
+            </div>
+
+            <div class="header-actions">
+                <a th:href="@{/}" class="btn btn-secondary">Inicio</a>
+                <a th:href="@{/presupuesto/form}" class="btn btn-primary">Nuevo presupuesto</a>
             </div>
         </div>
 
-        <table>
-            <thead>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <div th:if="${#lists.isEmpty(presupuestos)}" class="empty-state">
+            <h3>No hay presupuestos registrados</h3>
+            <p>Agrega un presupuesto para comenzar a controlar el gasto de cada proyecto.</p>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(presupuestos)}" class="table-card table-responsive">
+            <table>
+                <thead>
                 <tr>
-                    <th>Id</th>
+                    <th>ID</th>
                     <th>Proyecto</th>
-                    <th>Total</th>
+                    <th>Monto máximo</th>
+                    <th>Total gastado</th>
+                    <th>Saldo disponible</th>
                     <th>Editar</th>
                     <th>Eliminar</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 <tr th:each="presupuesto : ${presupuestos}">
-                    <td th:text="${presupuesto.id}"></td>
-                    <td th:text="${presupuesto.proyecto != null ? presupuesto.proyecto.nombre : 'Sin proyecto'}"></td>
-                    <td th:text="${presupuesto.total}"></td>
+                    <td class="cell-id" th:title="${presupuesto.id}">
+                        <span th:text="${presupuesto.id != null and presupuesto.id.length() > 14 ? presupuesto.id.substring(0, 8) + '...' + presupuesto.id.substring(presupuesto.id.length() - 4) : presupuesto.id}"></span>
+                    </td>
+                    <td th:text="${presupuesto.nombreProyecto}"></td>
+                    <td class="cell-number"><span class="money" th:attr="data-money=${presupuesto.montoMaximo}" th:text="${presupuesto.montoMaximo}"></span></td>
+                    <td class="cell-number"><span class="money" th:attr="data-money=${presupuesto.totalGastado}" th:text="${presupuesto.totalGastado}"></span></td>
+                    <td class="cell-number"><span class="money" th:attr="data-money=${presupuesto.saldoDisponible}" th:text="${presupuesto.saldoDisponible}"></span></td>
                     <td>
-                        <a class="btn btn-warning" th:href="@{/presupuesto/form/{id}(id=${presupuesto.id})}">
-                            Editar
-                        </a>
+                        <a class="btn btn-warning btn-small" th:href="@{/presupuesto/form/{id}(id=${presupuesto.id})}">Editar</a>
                     </td>
                     <td>
-                        <a class="btn btn-danger" th:href="@{/presupuesto/eliminar/{id}(id=${presupuesto.id})}"
-                           onclick="return confirm('¿Deseas eliminar este presupuesto?');">
-                            Eliminar
-                        </a>
+                        <a class="btn btn-danger btn-small"
+                           th:href="@{/presupuesto/eliminar/{id}(id=${presupuesto.id})}"
+                           onclick="return confirm('¿Deseas eliminar este presupuesto?');">Eliminar</a>
                     </td>
                 </tr>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const formatter = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+        document.querySelectorAll('.money[data-money]').forEach(el => {
+            const value = Number(el.dataset.money || 0);
+            el.textContent = formatter.format(value);
+        });
+    });
+</script>
 </body>
 </html>

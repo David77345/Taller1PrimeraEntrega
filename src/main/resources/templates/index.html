@@ -1,42 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inicio - Sistema de Proyectos</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
 </head>
 <body>
-    <div class="container">
+<div class="container">
+    <div class="page-shell">
         <header class="hero">
             <h1>Sistema de Gestión de Proyectos y Presupuestos</h1>
             <p>
-                Aplicación académica para administrar proyectos, materiales, presupuestos
-                y detalles de presupuesto con Spring Boot, Thymeleaf y H2.
+                Aplicación académica para administrar proyectos, materiales, presupuestos y cortes de obra
+                con Spring Boot, Thymeleaf y MongoDB.
             </p>
         </header>
 
         <section class="grid-menu">
             <a class="card-link" th:href="@{/proyecto/listar}">
-                <h2>Proyectos</h2>
-                <p>Registrar, editar y consultar proyectos.</p>
+                <div>
+                    <h2>Proyectos</h2>
+                    <p>Registrar, editar y consultar proyectos con su información principal.</p>
+                </div>
+                <span class="card-meta">Ir al módulo</span>
             </a>
 
             <a class="card-link" th:href="@{/material/listar}">
-                <h2>Materiales</h2>
-                <p>Administrar catálogo de materiales.</p>
+                <div>
+                    <h2>Materiales</h2>
+                    <p>Administrar el catálogo de materiales y mantener precios unitarios actualizados.</p>
+                </div>
+                <span class="card-meta">Ir al módulo</span>
             </a>
 
             <a class="card-link" th:href="@{/presupuesto/listar}">
-                <h2>Presupuestos</h2>
-                <p>Gestionar presupuestos asociados a proyectos.</p>
+                <div>
+                    <h2>Presupuestos</h2>
+                    <p>Controlar montos máximos, totales gastados y saldos disponibles por proyecto.</p>
+                </div>
+                <span class="card-meta">Ir al módulo</span>
             </a>
 
-            <a class="card-link" th:href="@{/detallepresupuesto/listar}">
-                <h2>Detalle Presupuesto</h2>
-                <p>Relacionar materiales con presupuestos.</p>
+            <a class="card-link" th:href="@{/corte/listar}">
+                <div>
+                    <h2>Cortes</h2>
+                    <p>Registrar cortes de obra con varios materiales y consolidar el gasto real.</p>
+                </div>
+                <span class="card-meta">Ir al módulo</span>
             </a>
         </section>
     </div>
+</div>
 </body>
 </html>

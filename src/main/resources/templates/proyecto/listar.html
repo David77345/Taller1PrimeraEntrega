@@ -1,48 +1,67 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${titulo}">Listado de Proyectos</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
-
 <body>
-    <h1 th:text="${titulo}"></h1>
+<div class="container">
+    <div class="page-shell">
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Listado de Proyectos</h1>
+                <p>Consulta, actualiza y administra los proyectos registrados en el sistema.</p>
+            </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nombre</th>
-                <th>Id Cliente</th>
-                <th>Fecha</th>
-                <th>Editar</th>
-                <th>Eliminar</th>
-            </tr>
-        </thead>
+            <div class="header-actions">
+                <a th:href="@{/}" class="btn btn-secondary">Inicio</a>
+                <a th:href="@{/proyecto/form}" class="btn btn-primary">Nuevo proyecto</a>
+            </div>
+        </div>
 
-        <tbody>
-            <tr th:each="proyecto : ${proyectos}">
-                <td th:text="${proyecto.id}"></td>
-                <td th:text="${proyecto.nombre}"></td>
-                <td th:text="${proyecto.idCliente}"></td>
-                <td th:text="${proyecto.fecha}"></td>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-                <td>
-                    <a class="editar" th:href="@{/proyecto/form/{id}(id=${proyecto.id})}">Editar</a>
-                </td>
+        <div th:if="${#lists.isEmpty(proyectos)}" class="empty-state">
+            <h3>No hay proyectos registrados</h3>
+            <p>Cuando agregues un proyecto nuevo, aparecerá aquí con su información principal.</p>
+        </div>
 
-                <td>
-                    <a class="eliminar" th:href="@{/proyecto/eliminar/{id}(id=${proyecto.id})}">Eliminar</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <br>
-
-    <a class="crear" th:href="@{/proyecto/form}">Crear Proyecto</a>
+        <div th:unless="${#lists.isEmpty(proyectos)}" class="table-card table-responsive">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>ID cliente</th>
+                    <th>Fecha</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="proyecto : ${proyectos}">
+                    <td class="cell-id" th:title="${proyecto.id}">
+                        <span th:text="${proyecto.id != null and proyecto.id.length() > 14 ? proyecto.id.substring(0, 8) + '...' + proyecto.id.substring(proyecto.id.length() - 4) : proyecto.id}"></span>
+                    </td>
+                    <td th:text="${proyecto.nombre}"></td>
+                    <td th:text="${proyecto.idCliente}"></td>
+                    <td th:text="${proyecto.fecha != null ? #dates.format(proyecto.fecha, 'yyyy-MM-dd') : ''}"></td>
+                    <td>
+                        <a class="btn btn-warning btn-small" th:href="@{/proyecto/form/{id}(id=${proyecto.id})}">Editar</a>
+                    </td>
+                    <td>
+                        <a class="btn btn-danger btn-small"
+                           th:href="@{/proyecto/eliminar/{id}(id=${proyecto.id})}"
+                           onclick="return confirm('¿Deseas eliminar este proyecto?');">Eliminar</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 </body>
 </html>

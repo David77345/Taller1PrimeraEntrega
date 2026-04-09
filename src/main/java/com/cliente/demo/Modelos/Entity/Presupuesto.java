@@ -1,83 +1,75 @@
 package com.cliente.demo.Modelos.Entity;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-@Entity
-@Table(name = "presupuestos")
-public class Presupuesto implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+@Document(collection = "presupuestos")
+public class Presupuesto {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "id_proyecto", nullable = false)
-    private Proyecto proyecto;
+    @NotBlank(message = "Debe seleccionar un proyecto")
+    @Field("proyecto_id")
+    private String proyectoId;
 
-    @NotNull(message = "El total es obligatorio")
-    @DecimalMin(value = "0.0", inclusive = true, message = "El total no puede ser negativo")
-    @Column(nullable = false)
-    private Double total;
+    @NotNull(message = "El monto máximo es obligatorio")
+    @DecimalMin(value = "0.0", inclusive = false, message = "El monto máximo debe ser mayor que 0")
+    private Double montoMaximo;
 
-    @OneToMany(mappedBy = "presupuesto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<DetallePresupuesto> detalles = new ArrayList<>();
+    @Field("total_gastado")
+    private Double totalGastado = 0.0;
 
     public Presupuesto() {
     }
 
-    public Presupuesto(Long id, Proyecto proyecto, Double total) {
+    public Presupuesto(String id, String proyectoId, Double montoMaximo, Double totalGastado) {
         this.id = id;
-        this.proyecto = proyecto;
-        this.total = total;
+        this.proyectoId = proyectoId;
+        this.montoMaximo = montoMaximo;
+        this.totalGastado = totalGastado;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public String getProyectoId() {
+        return proyectoId;
+    }
+
+    public Double getMontoMaximo() {
+        return montoMaximo;
+    }
+
+    public Double getTotalGastado() {
+        return totalGastado;
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 
-    public Proyecto getProyecto() {
-        return proyecto;
+    public void setProyectoId(String proyectoId) {
+        this.proyectoId = proyectoId;
     }
 
-    public void setProyecto(Proyecto proyecto) {
-        this.proyecto = proyecto;
+    public void setMontoMaximo(Double montoMaximo) {
+        this.montoMaximo = montoMaximo;
     }
 
-    public Double getTotal() {
-        return total;
+    public void setTotalGastado(Double totalGastado) {
+        this.totalGastado = totalGastado;
     }
 
-    public void setTotal(Double total) {
-        this.total = total;
-    }
-
-    public List<DetallePresupuesto> getDetalles() {
-        return detalles;
-    }
-
-    public void setDetalles(List<DetallePresupuesto> detalles) {
-        this.detalles = detalles;
+    public Double getSaldoDisponible() {
+        double max = montoMaximo != null ? montoMaximo : 0.0;
+        double gastado = totalGastado != null ? totalGastado : 0.0;
+        return max - gastado;
     }
 }
